@@ -9,7 +9,7 @@ import Combine
 import Foundation
 import FirebaseAuth
 
-final class SessionStore: ObservableObject {
+class SessionStore: ObservableObject {
     @Published private(set) var currentUser: AppUser?
     @Published private(set) var isAuthenticated: Bool = false
     

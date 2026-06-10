@@ -8,7 +8,13 @@
 import CoreData
 import CoreLocation
 
-final class LocalSessionRepository {
+protocol LocalSessionRepositoring {
+    func save(user: AppUser, coordinate: CLLocationCoordinate2D?)
+    func updateCoordinate(_ coordinate: CLLocationCoordinate2D)
+    func fetchSession() -> UserSession?
+}
+
+final class LocalSessionRepository: LocalSessionRepositoring {
     static let shared = LocalSessionRepository()
     
     private let context: NSManagedObjectContext

@@ -13,6 +13,7 @@ struct BCTextField: View {
     var isSecure: Bool = false
     var keyboardType: UIKeyboardType = .default
     var autocapitalization: TextInputAutocapitalization = .sentences
+    var accessibilityId: String? = nil
 
     var body: some View {
         Group {
@@ -29,5 +30,6 @@ struct BCTextField: View {
         .frame(height: BCSpacing.Component.fieldHeight)
         .background(Color.BC.surface)
         .foregroundStyle(Color.BC.textPrimary)
+        .accessibilityIdentifier(accessibilityId ?? placeholder)
     }
 }

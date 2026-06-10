@@ -15,10 +15,12 @@ final class HomeViewModel: ObservableObject {
     @Published var userCoordinate: CLLocationCoordinate2D?
     
     private let sessionStore: SessionStore
+    private let repository: LocalSessionRepositoring
     private var hasLoggedMapRendered = false
-    
-    init(sessionStore: SessionStore) {
+
+    init(sessionStore: SessionStore, repository: LocalSessionRepositoring = LocalSessionRepository.shared) {
         self.sessionStore = sessionStore
+        self.repository = repository
     }
     
     func updateLocation(_ location: CLLocation?) {
@@ -31,7 +33,7 @@ final class HomeViewModel: ObservableObject {
         )
         
         if let user = sessionStore.currentUser {
-            LocalSessionRepository.shared.updateCoordinate(coordinate)
+            repository.updateCoordinate(coordinate)
             
             if !hasLoggedMapRendered {
                 AnalyticsService.logMapRendered(userId: user.id)

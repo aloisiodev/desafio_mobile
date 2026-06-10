@@ -10,6 +10,7 @@ import SwiftUI
 struct BCPrimaryButton: View {
     let label: String
     var isLoading: Bool = false
+    var accessibilityId: String? = nil
     let action: () -> Void
 
     var body: some View {
@@ -31,6 +32,7 @@ struct BCPrimaryButton: View {
             .background(Color.BC.primary)
         }
         .disabled(isLoading)
+        .accessibilityIdentifier(accessibilityId ?? label)
     }
 }
 

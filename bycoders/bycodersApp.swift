@@ -34,7 +34,9 @@ struct bycodersApp: App {
                     }
             }
             .task {
-                sessionStore.restoreSession()
+                if !ProcessInfo.processInfo.arguments.contains("--reset-session") {
+                    sessionStore.restoreSession()
+                }
             }
             .environmentObject(sessionStore)
             .environment(

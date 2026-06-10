@@ -107,6 +107,7 @@ struct HomeView: View {
                     .frame(width: BCSpacing.Component.iconTap, height: BCSpacing.Component.iconTap)
                     .background(Color.BC.overlay)
             }
+            .accessibilityIdentifier("btn_logout")
         }
         .padding(BCSpacing.lg)
         .background(Color.BC.background.opacity(0.92))
