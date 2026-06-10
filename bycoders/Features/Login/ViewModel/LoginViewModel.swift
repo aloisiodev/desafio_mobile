@@ -31,12 +31,16 @@ final class LoginViewModel: ObservableObject {
         defer { isLoading = false }
         
         do {
-            return try await authService.signIn(
+            let user = try await authService.signIn(
                 email: email,
                 password: password
             )
+            
+            AnalyticsService.logMapRendered(userId: user.id)
+            return user
         } catch {
             errorMessage = error.localizedDescription
+            CrashlyticsService.record(error)
             return nil
         }
     }

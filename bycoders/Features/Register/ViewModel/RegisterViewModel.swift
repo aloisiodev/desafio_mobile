@@ -38,6 +38,7 @@ final class RegisterViewModel: ObservableObject {
             )
         } catch {
             errorMessage = error.localizedDescription
+            CrashlyticsService.record(error)
             return nil
         }
     }

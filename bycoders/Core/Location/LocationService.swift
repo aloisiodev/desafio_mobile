@@ -16,6 +16,7 @@ protocol LocationServicing: ObservableObject {
     func requestCurrentLocation()
 }
 
+@MainActor
 final class LocationService: NSObject, ObservableObject, LocationServicing {
     
     @Published private(set) var locationError: Error?
@@ -41,7 +42,7 @@ final class LocationService: NSObject, ObservableObject, LocationServicing {
     }
     
     func requestCurrentLocation() {
-        locationManager.requestLocation()
+        locationManager.startUpdatingLocation()
     }
 }
 
@@ -52,7 +53,7 @@ extension LocationService: CLLocationManagerDelegate {
         
         switch manager.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:
-            manager.requestLocation()
+            manager.startUpdatingLocation()
             
         default:
             break
@@ -60,10 +61,11 @@ extension LocationService: CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        currentLocation = locations.last
+        self.currentLocation = locations.last
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
-        locationError = error
+        self.locationError = error
+        CrashlyticsService.record(error)
     }
 }

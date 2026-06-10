@@ -9,100 +9,23 @@ import SwiftUI
 import MapKit
 
 struct HomeView: View {
-    
+
     @Binding var path: NavigationPath
-    
     @EnvironmentObject private var sessionStore: SessionStore
-    
-    @StateObject private var viewModel = HomeViewModel()
+    @StateObject private var viewModel: HomeViewModel
     @StateObject private var locationService = LocationService()
-    
+
+    init(path: Binding<NavigationPath> , sessionStore: SessionStore) {
+        self._path = path
+        self._viewModel = StateObject(wrappedValue: HomeViewModel(sessionStore: sessionStore))
+    }
     var body: some View {
         ZStack(alignment: .top) {
-            
-            if viewModel.region != nil {
-                Map(
-                    coordinateRegion: Binding(
-                        get: {
-                            viewModel.region!
-                        },
-                        set: {
-                            viewModel.region = $0
-                        }
-                    ),
-                    annotationItems: annotations
-                ) { annotation in
-                    MapAnnotation(coordinate: annotation.coordinate) {
-                        ZStack {
-                            Circle()
-                                .fill(Color(hex: "#0F62FE").opacity(0.25))
-                                .frame(width: 44, height: 44)
-                            
-                            Circle()
-                                .fill(Color(hex: "#0F62FE"))
-                                .frame(width: 18, height: 18)
-                        }
-                    }
-                }
-                .ignoresSafeArea()
-            } else if locationService.isPermissionDenied {
-                ZStack {
-                    Color(hex: "#161616")
-                        .ignoresSafeArea()
+            mapContent
 
-                    VStack(spacing: 16) {
-                        Image(systemName: "location.slash")
-                            .font(.system(size: 48))
-                            .foregroundStyle(.white)
-
-                        Text("Permissão de localização negada")
-                            .foregroundStyle(.white)
-                            .font(.system(size: 16, weight: .medium))
-
-                        Text("Habilite nas Configurações do dispositivo")
-                            .foregroundStyle(Color(hex: "#C6C6C6"))
-                            .font(.system(size: 14))
-                    }
-                }
-            } else if locationService.locationError != nil {
-                ZStack {
-                    Color(hex: "#161616")
-                        .ignoresSafeArea()
-
-                    VStack(spacing: 16) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.system(size: 48))
-                            .foregroundStyle(.orange)
-
-                        Text("Erro ao obter localização")
-                            .foregroundStyle(.white)
-                            .font(.system(size: 16, weight: .medium))
-
-                        Button("Tentar novamente") {
-                            locationService.requestCurrentLocation()
-                        }
-                        .foregroundStyle(Color(hex: "#78A9FF"))
-                    }
-                }
-            } else {
-                ZStack {
-                    Color(hex: "#161616")
-                        .ignoresSafeArea()
-
-                    VStack(spacing: 16) {
-                        ProgressView()
-                            .tint(.white)
-
-                        Text("Obtendo sua localização...")
-                            .foregroundStyle(.white)
-                            .font(.system(size: 14))
-                    }
-                }
-            }
-            
             headerView
-                .padding(.top, 16)
-                .padding(.horizontal, 16)
+                .padding(.top, BCSpacing.lg)
+                .padding(.horizontal, BCSpacing.lg)
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
@@ -113,42 +36,80 @@ struct HomeView: View {
             viewModel.updateLocation(location)
         }
     }
-    
-    private var annotations: [UserMapAnnotation] {
-        guard let coordinate = viewModel.userCoordinate else {
-            return []
+
+    @ViewBuilder
+    private var mapContent: some View {
+        if viewModel.region != nil {
+            Map(
+                coordinateRegion: Binding(
+                    get: { viewModel.region! },
+                    set: { viewModel.region = $0 }
+                ),
+                annotationItems: annotations
+            ) { annotation in
+                MapAnnotation(coordinate: annotation.coordinate) {
+                    BCMapPin()
+                }
+            }
+            .ignoresSafeArea()
+        } else if locationService.isPermissionDenied {
+            BCErrorState(
+                icon: "location.slash",
+                title: "Permissão de localização negada",
+                description: "Habilite nas Configurações do dispositivo"
+            )
+        } else if locationService.locationError != nil {
+            BCErrorState(
+                icon: "exclamationmark.triangle",
+                iconColor: .orange,
+                title: "Erro ao obter localização",
+                actionLabel: "Tentar novamente"
+            ) {
+                locationService.requestCurrentLocation()
+            }
+        } else {
+            ZStack {
+                Color.BC.background.ignoresSafeArea()
+                VStack(spacing: BCSpacing.lg) {
+                    ProgressView().tint(Color.BC.textPrimary)
+                    Text("Obtendo sua localização...")
+                        .font(Font.BC.body)
+                        .foregroundStyle(Color.BC.textPrimary)
+                }
+            }
         }
-        
-        return [
-            UserMapAnnotation(coordinate: coordinate)
-        ]
     }
-    
+
+    private var annotations: [UserMapAnnotation] {
+        guard let coordinate = viewModel.userCoordinate else { return [] }
+        return [UserMapAnnotation(coordinate: coordinate)]
+    }
+
     private var headerView: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: BCSpacing.xs) {
                 Text("Home")
-                    .font(.system(size: 24, weight: .semibold))
-                    .foregroundStyle(.white)
-                
+                    .font(Font.BC.cardTitle)
+                    .foregroundStyle(Color.BC.textPrimary)
+
                 Text(sessionStore.currentUser?.email ?? "Usuário logado")
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color(hex: "#C6C6C6"))
+                    .font(Font.BC.caption)
+                    .foregroundStyle(Color.BC.textSecondary)
             }
-            
+
             Spacer()
-            
+
             Button {
                 sessionStore.signOut()
             } label: {
                 Image(systemName: "rectangle.portrait.and.arrow.right")
-                    .foregroundStyle(.white)
-                    .frame(width: 44, height: 44)
-                    .background(Color.black.opacity(0.65))
+                    .foregroundStyle(Color.BC.textPrimary)
+                    .frame(width: BCSpacing.Component.iconTap, height: BCSpacing.Component.iconTap)
+                    .background(Color.BC.overlay)
             }
         }
-        .padding(16)
-        .background(Color(hex: "#161616").opacity(0.92))
+        .padding(BCSpacing.lg)
+        .background(Color.BC.background.opacity(0.92))
     }
 }
 
@@ -162,11 +123,11 @@ struct UserMapAnnotation: Identifiable {
 }
 
 private struct HomePreview: View {
-    
+
     @State private var path = NavigationPath()
-    
+
     var body: some View {
-        HomeView(path: $path)
+        HomeView(path: $path, sessionStore: SessionStore())
             .environmentObject(SessionStore())
     }
 }

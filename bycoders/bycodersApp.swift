@@ -29,7 +29,7 @@ struct bycodersApp: App {
                         case .register:
                             RegisterView(path: $path)
                         case .home:
-                            HomeView(path: $path)
+                            HomeView(path: $path, sessionStore: sessionStore)
                         }
                     }
             }
@@ -47,7 +47,7 @@ struct bycodersApp: App {
     @ViewBuilder
     private var rootView: some View {
         if sessionStore.isAuthenticated {
-            HomeView(path: $path)
+            HomeView(path: $path, sessionStore: sessionStore)
         } else {
             LoginView(path: $path)
         }

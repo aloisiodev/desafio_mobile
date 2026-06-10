@@ -32,6 +32,7 @@ final class SessionStore: ObservableObject {
     func setUser(_ user: AppUser) {
         currentUser = user
         isAuthenticated = true
+        LocalSessionRepository.shared.save(user: user, coordinate: nil)
     }
     
     func clearUser() {

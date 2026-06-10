@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct LoginView: View {
-    
+
     @EnvironmentObject private var sessionStore: SessionStore
     @StateObject private var viewModel: LoginViewModel
     @Binding var path: NavigationPath
-    
+
     init(path: Binding<NavigationPath>) {
         self._path = path
         self._viewModel = StateObject(
@@ -21,108 +21,75 @@ struct LoginView: View {
             )
         )
     }
-    
+
     var body: some View {
         ZStack {
-            Color(hex: "#161616")
-                .ignoresSafeArea()
-            
-            VStack(alignment: .leading, spacing: 32) {
+            Color.BC.background.ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: BCSpacing.xxl) {
                 Spacer()
-                
+
                 Image("bclogo")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 160)
-                
-                VStack(alignment: .leading, spacing: 8) {
+                    .frame(width: BCSpacing.Component.logo)
+
+                VStack(alignment: .leading, spacing: BCSpacing.sm) {
                     Text("Login")
-                        .font(.system(size: 32, weight: .light))
-                        .foregroundStyle(.white)
-                    
+                        .font(Font.BC.pageTitle)
+                        .foregroundStyle(Color.BC.textPrimary)
+
                     Text("Entre com seu e-mail e senha.")
-                        .font(.system(size: 14))
-                        .foregroundStyle(Color(hex: "#C6C6C6"))
+                        .font(Font.BC.body)
+                        .foregroundStyle(Color.BC.textSecondary)
                 }
-                
-                VStack(spacing: 12) {
-                    TextField("E-mail", text: $viewModel.email)
-                        .keyboardType(.emailAddress)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .padding(.horizontal, 16)
-                        .frame(height: 56)
-                        .background(Color(hex: "#262626"))
-                        .foregroundStyle(.white)
-                    
-                    SecureField("Senha", text: $viewModel.password)
-                        .padding(.horizontal, 16)
-                        .frame(height: 56)
-                        .background(Color(hex: "#262626"))
-                        .foregroundStyle(.white)
+
+                VStack(spacing: BCSpacing.md) {
+                    BCTextField(
+                        placeholder: "E-mail",
+                        text: $viewModel.email,
+                        keyboardType: .emailAddress,
+                        autocapitalization: .never
+                    )
+
+                    BCTextField(
+                        placeholder: "Senha",
+                        text: $viewModel.password,
+                        isSecure: true
+                    )
                 }
-                
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
                         .font(.footnote)
                         .foregroundStyle(.red)
                 }
-                
-                Button {
+
+                BCPrimaryButton(label: "Entrar", isLoading: viewModel.isLoading) {
                     Task {
                         if let user = await viewModel.signIn() {
                             path.removeLast(path.count)
                             sessionStore.setUser(user)
                         }
                     }
-                } label: {
-                    HStack {
-                        if viewModel.isLoading {
-                            ProgressView()
-                                .tint(.white)
-                        } else {
-                            Text("Entrar")
-                            Spacer()
-                            Image(systemName: "arrow.right")
-                        }
-                    }
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 20)
-                    .frame(height: 52)
-                    .frame(maxWidth: .infinity)
-                    .background(Color(hex: "#0F62FE"))
                 }
-                .disabled(viewModel.isLoading)
-                
-                VStack(alignment: .leading, spacing: 12) {
+
+                VStack(alignment: .leading, spacing: BCSpacing.md) {
                     Rectangle()
-                        .fill(Color(hex: "#393939"))
+                        .fill(Color.BC.divider)
                         .frame(height: 1)
-                    
-                    Button {
+
+                    BCLinkButton(
+                        leadingText: "Não possui uma conta?",
+                        trailingText: "Criar conta"
+                    ) {
                         path.append(AppRoute.register)
-                    } label: {
-                        HStack {
-                            Text("Não possui uma conta?")
-                                .foregroundStyle(Color(hex: "#C6C6C6"))
-                            
-                            Text("Criar conta")
-                                .fontWeight(.semibold)
-                                .foregroundStyle(Color(hex: "#78A9FF"))
-                            
-                            Spacer()
-                            
-                            Image(systemName: "arrow.right")
-                                .foregroundStyle(Color(hex: "#78A9FF"))
-                        }
-                        .font(.system(size: 14))
                     }
                 }
-                
+
                 Spacer()
             }
-            .padding(.horizontal, 24)
+            .padding(.horizontal, BCSpacing.xl)
         }
         .navigationBarBackButtonHidden(true)
     }
@@ -133,21 +100,18 @@ struct LoginView: View {
 }
 
 private struct LoginPreview: View {
-    
+
     @State private var path = NavigationPath()
-    
+
     var body: some View {
         NavigationStack(path: $path) {
             LoginView(path: $path)
                 .environmentObject(SessionStore())
                 .navigationDestination(for: AppRoute.self) { route in
                     switch route {
-                    case .register:
-                        Text("RegisterView")
-                    case .home:
-                        Text("HomeView")
-                    case .login:
-                        Text("LoginView")
+                    case .register: Text("RegisterView")
+                    case .home:     Text("HomeView")
+                    case .login:    Text("LoginView")
                     }
                 }
         }
