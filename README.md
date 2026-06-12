@@ -6,7 +6,7 @@
 ![Firebase](https://img.shields.io/badge/Firebase-12.14-yellow?logo=firebase)
 ![SPM](https://img.shields.io/badge/SPM-compatible-brightgreen)
 
-Implementação do desafio mobile da bycoders por [Aloisio Mello](https://github.com/aloisiomello). O descritivo original do desafio está em [desafio.md](desafio.md).
+Implementação do desafio mobile da bycoders por [Aloisio Mello](https://github.com/aloisiodev). O descritivo original do desafio está em [desafio.md](desafio.md).
 
 # Implementação
 
