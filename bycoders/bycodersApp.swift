@@ -34,7 +34,7 @@ struct bycodersApp: App {
                     }
             }
             .task {
-                if !ProcessInfo.processInfo.arguments.contains("--reset-session") {
+                if !LaunchArguments.resetSession {
                     sessionStore.restoreSession()
                 }
             }
@@ -48,7 +48,7 @@ struct bycodersApp: App {
     
     @ViewBuilder
     private var rootView: some View {
-        if sessionStore.isAuthenticated {
+        if sessionStore.isAuthenticated || LaunchArguments.skipAuth {
             HomeView(path: $path, sessionStore: sessionStore)
         } else {
             LoginView(path: $path)

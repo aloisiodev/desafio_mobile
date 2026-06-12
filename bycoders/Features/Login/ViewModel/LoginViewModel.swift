@@ -17,30 +17,38 @@ final class LoginViewModel: ObservableObject {
     @Published var errorMessage: String?
     
     private let authService: AuthServicing
-    
-    init(authService: AuthServicing = FirebaseAuthService()) {
+    private let analytics: AnalyticsServicing
+    private let crashlytics: CrashlyticsServicing
+
+    init(
+        authService: AuthServicing = FirebaseAuthService(),
+        analytics: AnalyticsServicing = AnalyticsService(),
+        crashlytics: CrashlyticsServicing = CrashlyticsService()
+    ) {
         self.authService = authService
+        self.analytics = analytics
+        self.crashlytics = crashlytics
     }
-    
+
     func signIn() async -> AppUser? {
         guard validateFields() else { return nil }
-        
+
         isLoading = true
         errorMessage = nil
-        
+
         defer { isLoading = false }
-        
+
         do {
             let user = try await authService.signIn(
                 email: email,
                 password: password
             )
-            
-            AnalyticsService.logMapRendered(userId: user.id)
+
+            analytics.logLoginSuccess(userId: user.id)
             return user
         } catch {
             errorMessage = error.localizedDescription
-            CrashlyticsService.record(error)
+            crashlytics.record(error)
             return nil
         }
     }

@@ -16,11 +16,7 @@ struct RegisterView: View {
 
     init(path: Binding<NavigationPath>) {
         self._path = path
-        _viewModel = StateObject(
-            wrappedValue: RegisterViewModel(
-                authService: FirebaseAuthService()
-            )
-        )
+        _viewModel = StateObject(wrappedValue: RegisterViewModel())
     }
 
     var body: some View {
@@ -56,13 +52,15 @@ struct RegisterView: View {
                     BCTextField(
                         placeholder: "Senha",
                         text: $viewModel.password,
-                        isSecure: true
+                        isSecure: true,
+                        accessibilityId: "field_password"
                     )
 
                     BCTextField(
                         placeholder: "Confirmar senha",
                         text: $viewModel.confirmPassword,
-                        isSecure: true
+                        isSecure: true,
+                        accessibilityId: "field_confirm_password"
                     )
                 }
 

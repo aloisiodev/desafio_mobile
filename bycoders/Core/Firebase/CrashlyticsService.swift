@@ -7,14 +7,19 @@
 
 import FirebaseCrashlytics
 
-enum CrashlyticsService {
-    static func record(_ error: Error) {
+protocol CrashlyticsServicing {
+    func record(_ error: Error)
+    func record(message: String)
+}
+
+final class CrashlyticsService: CrashlyticsServicing {
+    init() {}
+
+    func record(_ error: Error) {
         Crashlytics.crashlytics().record(error: error)
-        print("[Crashlytics] Recording error: \(error.localizedDescription)")
     }
-    
-    static func record(message: String) {
+
+    func record(message: String) {
         Crashlytics.crashlytics().log(message)
-        print("[Crashlytics] Recording error: \(message)")
     }
 }

@@ -7,18 +7,19 @@
 
 import FirebaseAnalytics
 
-enum AnalyticsService {
-    static func logLoginSuccess(userId: String) {
-        Analytics.logEvent("login_success", parameters: [
-            "user_id": userId
-        ])
-        print("[Analytics] login_success for user: \(userId)")
+protocol AnalyticsServicing {
+    func logLoginSuccess(userId: String)
+    func logMapRendered(userId: String)
+}
+
+final class AnalyticsService: AnalyticsServicing {
+    init() {}
+
+    func logLoginSuccess(userId: String) {
+        Analytics.logEvent("login_success", parameters: ["user_id": userId])
     }
-    
-    static func logMapRendered(userId: String) {
-        Analytics.logEvent("map_rendered", parameters: [
-            "user_id": userId
-        ])
-        print("[Analytics] map_rendered for user: \(userId)")
+
+    func logMapRendered(userId: String) {
+        Analytics.logEvent("map_rendered", parameters: ["user_id": userId])
     }
 }

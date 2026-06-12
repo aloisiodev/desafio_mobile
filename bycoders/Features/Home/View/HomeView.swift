@@ -9,16 +9,17 @@ import SwiftUI
 import MapKit
 
 struct HomeView: View {
-
-    @Binding var path: NavigationPath
     @EnvironmentObject private var sessionStore: SessionStore
+    @Binding var path: NavigationPath
+    
     @StateObject private var viewModel: HomeViewModel
     @StateObject private var locationService = LocationService()
 
-    init(path: Binding<NavigationPath> , sessionStore: SessionStore) {
+    init(path: Binding<NavigationPath>, sessionStore: SessionStore) {
         self._path = path
         self._viewModel = StateObject(wrappedValue: HomeViewModel(sessionStore: sessionStore))
     }
+    
     var body: some View {
         ZStack(alignment: .top) {
             mapContent
@@ -29,6 +30,7 @@ struct HomeView: View {
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
+            guard !isSimulatingLocationDenied else { return }
             locationService.requestLocationPermission()
             locationService.requestCurrentLocation()
         }
@@ -37,12 +39,16 @@ struct HomeView: View {
         }
     }
 
+    private var isSimulatingLocationDenied: Bool {
+        LaunchArguments.simulateLocationDenied
+    }
+
     @ViewBuilder
     private var mapContent: some View {
-        if viewModel.region != nil {
+        if let region = viewModel.region, !isSimulatingLocationDenied {
             Map(
                 coordinateRegion: Binding(
-                    get: { viewModel.region! },
+                    get: { viewModel.region ?? region },
                     set: { viewModel.region = $0 }
                 ),
                 annotationItems: annotations
@@ -52,7 +58,7 @@ struct HomeView: View {
                 }
             }
             .ignoresSafeArea()
-        } else if locationService.isPermissionDenied {
+        } else if locationService.isPermissionDenied || isSimulatingLocationDenied {
             BCErrorState(
                 icon: "location.slash",
                 title: "Permissão de localização negada",

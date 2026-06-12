@@ -27,11 +27,13 @@ struct BCErrorState: View {
                 Text(title)
                     .font(Font.BC.button)
                     .foregroundStyle(Color.BC.textPrimary)
+                    .accessibilityIdentifier("error_title")
 
                 if let description {
                     Text(description)
                         .font(Font.BC.body)
                         .foregroundStyle(Color.BC.textSecondary)
+                        .accessibilityIdentifier("error_description")
                 }
 
                 if let actionLabel, let action {
@@ -39,5 +41,6 @@ struct BCErrorState: View {
                 }
             }
         }
+        .accessibilityIdentifier("error_state")
     }
 }

@@ -18,19 +18,24 @@ final class RegisterViewModel: ObservableObject {
     @Published var errorMessage: String?
     
     private let authService: AuthServicing
-    
-    init(authService: AuthServicing = FirebaseAuthService()) {
+    private let crashlytics: CrashlyticsServicing
+
+    init(
+        authService: AuthServicing = FirebaseAuthService(),
+        crashlytics: CrashlyticsServicing = CrashlyticsService()
+    ) {
         self.authService = authService
+        self.crashlytics = crashlytics
     }
-    
+
     func createUser() async -> AppUser? {
         guard validateFields() else { return nil }
-        
+
         isLoading = true
         errorMessage = nil
-        
+
         defer { isLoading = false }
-        
+
         do {
             return try await authService.createUser(
                 email: email,
@@ -38,7 +43,7 @@ final class RegisterViewModel: ObservableObject {
             )
         } catch {
             errorMessage = error.localizedDescription
-            CrashlyticsService.record(error)
+            crashlytics.record(error)
             return nil
         }
     }

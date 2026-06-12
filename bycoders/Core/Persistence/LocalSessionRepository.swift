@@ -34,7 +34,6 @@ final class LocalSessionRepository: LocalSessionRepositoring {
         }
         
         try? context.save()
-        print("[CoreData] Saved user: \(user.email) at lat: \(coordinate?.latitude ?? 0), lon: \(coordinate?.longitude ?? 0)")
     }
     
     func updateCoordinate(_ coordinate: CLLocationCoordinate2D) {
@@ -42,7 +41,6 @@ final class LocalSessionRepository: LocalSessionRepositoring {
         session.lastLatitude = String(coordinate.latitude)
         session.lastLongitude = String(coordinate.longitude)
         try? context.save()
-        print("[CoreData] Updated coordinate: lat: \(coordinate.latitude), lon: \(coordinate.longitude)")
     }
 
     func fetchSession() -> UserSession? {

@@ -28,11 +28,22 @@ final class LocationService: NSObject, ObservableObject, LocationServicing {
     }
     
     private let locationManager = CLLocationManager()
-    
+    private let crashlytics: CrashlyticsServicing
+
     override init() {
         self.authorizationStatus = locationManager.authorizationStatus
+        self.crashlytics = CrashlyticsService()
         super.init()
-        
+
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+    }
+
+    init(crashlytics: CrashlyticsServicing) {
+        self.authorizationStatus = locationManager.authorizationStatus
+        self.crashlytics = crashlytics
+        super.init()
+
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
     }
@@ -66,6 +77,6 @@ extension LocationService: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
         self.locationError = error
-        CrashlyticsService.record(error)
+        crashlytics.record(error)
     }
 }

@@ -15,11 +15,7 @@ struct LoginView: View {
 
     init(path: Binding<NavigationPath>) {
         self._path = path
-        self._viewModel = StateObject(
-            wrappedValue: LoginViewModel(
-                authService: FirebaseAuthService()
-            )
-        )
+        self._viewModel = StateObject(wrappedValue: LoginViewModel())
     }
 
     var body: some View {
@@ -85,6 +81,7 @@ struct LoginView: View {
                     ) {
                         path.append(AppRoute.register)
                     }
+                    .accessibilityIdentifier("btn_create_account")
                 }
 
                 Spacer()
